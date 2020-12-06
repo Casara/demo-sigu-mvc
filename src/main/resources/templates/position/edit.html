@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <div th:replace="fragments/header :: head" />
+  </head>
+  <body>
+    <div id="main" v-cloak>
+      <div th:replace="fragments/header :: navbar" />
+      <b-container id="main">
+        <b-row>
+          <b-col lg="12" class="mt-3">
+            <h2>Editar cargo</h2>
+          </b-col>
+          <b-col lg="12" class="my-1">
+            <validation-observer ref="observer" v-slot="{ handleSubmit }">
+              <b-form @submit.stop.prevent="handleSubmit(onSubmit)">
+                <input type="hidden" v-model="id" th:v-init="@{'\'' + ${domain.id} + '\''}">
+                <validation-provider name="name" v-slot="validationContext">
+                  <b-form-group label="Nome" label-for="name">
+                    <b-form-input
+                      id="name"
+                      v-model="form.name"
+                      :state="getValidationState(validationContext)"
+                      th:v-init="@{'\'' + ${domain.name} + '\''}"
+                      autofocus
+                    ></b-form-input>
+                    <b-form-invalid-feedback>
+                      {{ validationContext.errors[0] }}
+                    </b-form-invalid-feedback>
+                  </b-form-group>
+                </validation-provider>
+                <b-button type="submit" squared variant="outline-primary" :disabled="isBusy">
+                  <b-spinner small v-show="isBusy"></b-spinner>
+                  <span v-show="isBusy">Salvando...</span>
+                  <span v-show="!isBusy">Salvar</span>
+                </b-button>
+                <b-button type="reset" squared variant="outline-danger" @click="resetForm()" :disabled="isBusy">
+                  Limpar
+                </b-button>
+              </b-form>
+            </validation-observer>
+          </b-col>
+        </b-row>
+      </b-container>
+      <div th:replace="fragments/footer :: footer" />
+      <script th:src="@{/js/vendor/vee-validate.min.js}"></script>
+      <script th:src="@{/js/position/edit.js}"></script>
+    </div>
+  </body>
+</html>

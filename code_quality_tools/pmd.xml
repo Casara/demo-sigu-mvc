@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+  <description>
+    Custom rules
+  </description>
+  <!-- Your rules will come here -->
+
+  <rule ref="category/java/bestpractices.xml">
+    <exclude name="AbstractClassWithoutAbstractMethod" />
+    <exclude name="JUnitAssertionsShouldIncludeMessage" />
+  </rule>
+  <rule ref="category/java/codestyle.xml" />
+  <!--
+  <rule ref="category/java/design.xml" />
+  <rule ref="category/java/documentation.xml" />
+  <rule ref="category/java/errorprone.xml" />
+  -->
+  <rule ref="category/java/multithreading.xml" />
+  <rule ref="category/java/performance.xml" />
+  <rule ref="category/java/security.xml" />
+
+  <rule ref="category/java/bestpractices.xml/JUnitTestContainsTooManyAsserts">
+    <properties>
+      <property name="maximumAsserts" value="3" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/AtLeastOneConstructor">
+    <properties>
+      <property name="ignoredAnnotations" value="javax.persistence.MappedSuperclass|lombok.Data|lombok.Value|lombok.Builder|lombok.NoArgsConstructor|lombok.RequiredArgsConstructor|lombok.AllArgsConstructor|org.springframework.boot.autoconfigure.SpringBootApplication|org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest|org.springframework.boot.test.context.SpringBootTest|org.springframework.context.annotation.Configuration|org.springframework.web.bind.annotation.RestControllerAdvice" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/ClassNamingConventions">
+    <properties>
+      <property name="classPattern" value="[A-Z][a-zA-Z0-9]*" />
+      <property name="abstractClassPattern" value="[A-Z][a-zA-Z0-9]*" />
+      <property name="interfacePattern" value="[A-Z][a-zA-Z0-9]*" />
+      <property name="enumPattern" value="[A-Z][a-zA-Z0-9]*" />
+      <property name="annotationPattern" value="[A-Z][a-zA-Z0-9]*" />
+      <property name="utilityClassPattern" value="[A-Z][a-zA-Z0-9]+(Constants|Helper|Mapper|Reader|Request|Response|Stub|Utils?)" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/MethodNamingConventions">
+    <properties>
+      <property name="methodPattern" value="[a-z][a-zA-Z0-9]*" />
+      <property name="staticPattern" value="[a-z][a-zA-Z0-9]*" />
+      <property name="nativePattern" value="[a-z][a-zA-Z0-9]*" />
+      <!-- test_methodName_withCertainState_shouldDoSomething -->
+      <property name="junit3TestPattern" value="test_[a-z][a-zA-Z0-9]*(_with(out)?[A-Z0-9][a-zA-Z0-9]*)?_should[A-Z0-9][a-zA-Z0-9]*" />
+      <property name="junit4TestPattern" value="test_[a-z][a-zA-Z0-9]*(_with(out)?[A-Z0-9][a-zA-Z0-9]*)?_should[A-Z0-9][a-zA-Z0-9]*" />
+      <property name="junit5TestPattern" value="test_[a-z][a-zA-Z0-9]*(_with(out)?[A-Z0-9][a-zA-Z0-9]*)?_should[A-Z0-9][a-zA-Z0-9]*" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/ShortClassName">
+    <properties>
+      <property name="minimum" value="3" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/ShortMethodName">
+    <properties>
+      <property name="minimum" value="2" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/ShortVariable">
+    <properties>
+      <property name="minimum" value="2" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/LongVariable">
+    <properties>
+      <property name="minimum" value="20" />
+    </properties>
+  </rule>
+  <rule ref="category/java/codestyle.xml/TooManyStaticImports">
+    <properties>
+      <property name="maximumStaticImports" value="10" />
+    </properties>
+  </rule>
+  <rule ref="category/java/design.xml/TooManyMethods">
+    <properties>
+      <property name="maxmethods" value="10" />
+    </properties>
+  </rule>
+</ruleset>

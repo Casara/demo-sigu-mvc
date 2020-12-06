@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <div th:replace="fragments/header :: head" />
+  </head>
+  <body>
+    <div id="main" v-cloak>
+      <div id="flashError" th:text="${error}" v-show="false"></div>
+      <div th:replace="fragments/header :: navbar" />
+      <b-container id="main">
+        <b-row>
+          <b-col lg="6" class="mt-3">
+            <h2>Cargos</h2>
+          </b-col>
+          <b-col lg="6" class="mt-3">
+            <b-button class="float-right" href="/positions/new" squared size="sm" variant="outline-success">
+              <b-icon icon="plus-circle" aria-hidden="true"></b-icon>
+              Adicionar
+            </b-button>
+          </b-col>
+          <b-col lg="12" class="my-1">
+            <b-table
+              :items="items"
+              :fields="fields"
+              :busy="isBusy"
+              head-variant="dark"
+              responsive="sm"
+              bordered
+              hover
+              striped
+              show-empty
+              small
+            >
+              <template #empty="scope">
+                <h4>Não há dados cadastrados.</h4>
+              </template>
+              <template #table-busy>
+                <div class="text-center text-danger my-2">
+                  <b-spinner class="align-middle"></b-spinner>
+                  <strong>Carregando...</strong>
+                </div>
+              </template>
+              <template #cell(actions)="row">
+                <b-button
+                  :href="'/positions/edit/' + row.item.id"
+                  squared
+                  size="sm"
+                  variant="outline-info"
+                >
+                  <b-icon icon="pencil" aria-hidden="true"></b-icon>
+                </b-button>
+                <b-button squared size="sm" variant="outline-danger" @click="doDelete(row.item)">
+                  <b-icon icon="trash" aria-hidden="true"></b-icon>
+                </b-button>
+              </template>
+            </b-table>
+          </b-col>
+        </b-row>
+      </b-container>
+      <div th:replace="fragments/footer :: footer" />
+      <script th:src="@{/js/position/index.js}"></script>
+    </div>
+  </body>
+</html>

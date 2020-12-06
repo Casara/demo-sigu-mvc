@@ -1,0 +1,206 @@
+plugins {
+  id 'idea'
+  id 'eclipse'
+  id 'java'
+  id 'checkstyle'
+  id 'pmd'
+  id 'jacoco'
+  id 'info.solidsoft.pitest' version '1.5.2'
+	id 'org.springframework.boot' version '2.4.0'
+	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
+  id 'io.franzbecker.gradle-lombok' version '4.0.0'
+}
+
+description = 'Sistema de Gerenciamento de Usuários'
+group = 'br.casara'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = JavaVersion.VERSION_15
+targetCompatibility = JavaVersion.VERSION_15
+
+springBoot {
+  buildInfo {
+    properties {
+      artifact = project.name
+      version = project.version
+      group = project.group
+      name = project.description
+      additional = [
+          'created-by'   : "Gradle ${gradle.gradleVersion}",
+          'built-by'     : System.getProperty('user.name'),
+          'built-jdk'    : "${System.getProperty('java.version')} (${System.getProperty('java.vendor')} ${System.getProperty('java.vm.version')})",
+          'build-os'     : "${System.getProperty('os.name')} ${System.getProperty('os.arch')} ${System.getProperty('os.version')}",
+          'contact-name' : 'Rodrigo Casara',
+          'contact-url'  : 'rodrigocasara@gmail.com'
+      ]
+    }
+  }
+}
+
+bootJar {
+  launchScript()
+}
+
+configurations {
+  implementation.exclude module: 'spring-boot-starter-tomcat'
+  testImplementation.exclude module: 'junit-vintage-engine'
+  testImplementation.exclude module: 'junit'
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+  set('projectPackage', "${project.group}.${project.name.replace('-', '')}")
+  set('junitVersion', '5.7.0')
+  set('lombokVersion', '1.18.16')
+  set('mapstructVersion', '1.4.0.CR1')
+  set('mockitoJunitVersion', '3.6.28')
+	set('testcontainersVersion', '1.15.0')
+  set('zalandoProblemVersion', '0.26.1')
+}
+
+dependencies {
+  implementation "org.zalando:problem-spring-web-starter:${zalandoProblemVersion}"
+  implementation "org.zalando:problem-spring-web-starter:${zalandoProblemVersion}"
+  implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-cache'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation 'org.springframework.boot:spring-boot-starter-undertow'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+
+  compileOnly "org.projectlombok:lombok:${lombokVersion}"
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation "org.mockito:mockito-junit-jupiter:${mockitoJunitVersion}"
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:postgresql'
+}
+
+dependencyManagement {
+	imports {
+    mavenBom "org.junit:junit-bom:${junitVersion}"
+		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+	}
+}
+
+test {
+  useJUnitPlatform {
+    includeEngines 'junit-jupiter'
+  }
+}
+
+tasks.withType(JavaCompile) {
+  options.encoding = 'UTF-8'
+  options.fork = true
+  options.incremental = true
+  options.compilerArgs += [
+    '-Xlint:deprecation',
+    '-Xlint:unchecked',
+    '-Amapstruct.suppressGeneratorTimestamp=true',
+    '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+    '-Amapstruct.defaultComponentModel=spring'
+  ]
+}
+
+checkstyle {
+  configFile = new File(rootDir, '/code_quality_tools/checkstyle.xml')
+  toolVersion = '8.38'
+  ignoreFailures = false
+  maxWarnings = 0
+}
+
+jacoco {
+  toolVersion = '0.8.6'
+}
+
+task codeCoverageReport(type: JacocoReport) {
+  // always run the tests before generating the report
+  dependsOn subprojects*.test
+  // Gather execution data from all subprojects
+  // (change this if you e.g. want to calculate unit test/integration test coverage separately)
+  executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+}
+
+jacocoTestReport {
+  reports {
+    csv.enabled false
+    html.enabled true
+    html.destination file("${buildDir}/reports/jacoco/html")
+    xml.enabled true
+    xml.destination file("${buildDir}/reports/jacoco/xml")
+  }
+}
+
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      element = 'CLASS'
+      excludes = [
+        "${projectPackage}.Application"
+      ]
+
+      limit {
+        counter = 'LINE'
+        value = 'COVEREDRATIO'
+        minimum = 0.0 // 0.8
+      }
+    }
+
+    rule {
+      element = 'METHOD'
+      excludes = [
+        "${projectPackage}.Application.main(java.lang.String[])"
+      ]
+
+      limit {
+        counter = 'COMPLEXITY'
+        value = 'COVEREDRATIO'
+        minimum = 0.0  // 0.8
+      }
+    }
+  }
+}
+
+test.finalizedBy jacocoTestReport
+check.dependsOn jacocoTestCoverageVerification
+
+pmd {
+  toolVersion = "6.29.0"
+  ruleSetFiles = files('code_quality_tools/pmd.xml')
+  ruleSets = []
+}
+
+pitest {
+  targetClasses = ["${projectPackage}.*"]
+  threads = 4
+  // adds dependency to org.pitest:pitest-junit5-plugin and sets "testPlugin" to "junit5"
+  junit5PluginVersion = '0.12'
+  outputFormats = ['XML', 'HTML']
+}
+
+task runTests(type: GradleBuild) {
+  group 'continuous delivery'
+  description = 'Unit tests and mutation tests'
+  setTasks(['clean', 'test', 'pitest'])
+}
+
+task codeQuality(type: GradleBuild) {
+  group 'continuous delivery'
+  description = 'Code quality verification'
+  setTasks(['pmdMain', 'pmdTest', 'checkstyleMain', 'checkstyleTest'])
+}

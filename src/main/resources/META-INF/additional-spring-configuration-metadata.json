@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "problem.with-stack-traces",
+      "type": "java.lang.Boolean",
+      "defaultValue": false
+    }
+  ]
+}

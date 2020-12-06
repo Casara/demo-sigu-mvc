@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  db:
+    image: postgres
+    container_name: sigudb
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=sigudb
+      - POSTGRES_USER=sigu
+      - POSTGRES_PASSWORD=secret
+
+  sigu:
+    image: sigu
+    build: ./
+    container_name: sigu
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SIGU_SERVER_PORT=8080
+      - SIGU_DB_URL=jdbc:postgresql://db:5432/sigudb
+      - SIGU_DB_USER=sigu
+      - SIGU_DB_PASSWORD=secret
